@@ -36,7 +36,8 @@ else:
     import importlib_resources
 
 # Download endpoint
-EMOJI_VERSION = "13.1"
+# EMOJI_VERSION = "13.1"
+EMOJI_VERSION = "latest"  # Use latest
 URL = "https://unicode.org/Public/emoji/%s/emoji-test.txt" % EMOJI_VERSION
 METADATA_PATH = Path(__file__).parent / "metadata.json"
 
