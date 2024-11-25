@@ -20,6 +20,7 @@ import os.path
 import re
 import sys
 import warnings
+from pathlib import Path
 
 try:
     # Enable faster loads with ujson if installed
@@ -35,9 +36,10 @@ else:
     import importlib_resources
 
 # Download endpoint
-EMOJI_VERSION = "13.1"
+# EMOJI_VERSION = "13.1"
+EMOJI_VERSION = "latest"  # Use latest
 URL = "https://unicode.org/Public/emoji/%s/emoji-test.txt" % EMOJI_VERSION
-
+METADATA_PATH = Path(__file__).parent / "metadata.json"
 
 _depr_msg = (
     "The %s attribute is deprecated"
@@ -152,16 +154,16 @@ def replace_with_desc(string, sep=":"):
     return result
 
 
-# This variable is updated automatically from scripts/download_codes.py
-_LDT = datetime.datetime(
-    2021, 7, 18, 19, 57, 25, 20304, tzinfo=datetime.timezone.utc
-)  # noqa: E501
-
-
 def last_downloaded_timestamp():
     # This is retained as a callable rather than plain module attribute
     # for backwards compatibility.
-    return _LDT
+    with open(METADATA_PATH, "r") as infile:
+        ldt = datetime.datetime.strptime(
+            json.load(infile)["ldt"],
+            "%Y%m%d %H:%M:%S %Z",
+        )
+
+    return ldt
 
 
 def _compile_codes(codes):

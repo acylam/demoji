@@ -18,6 +18,7 @@ from demoji import URL
 parent = pathlib.Path(__file__).parent.parent.resolve() / "demoji"
 CACHEPATH = parent / "codes.json"
 MODULEPATH = parent / "__init__.py"
+METADATA_PATH = parent / "metadata.json"
 
 
 def download_codes(dest=CACHEPATH):
@@ -85,17 +86,18 @@ def _raw_stream_unicodeorg_emojifile(url):
 
 
 def replace_lastdownloaded_timestamp():
-    with open(MODULEPATH) as f:
-        text = f.read()
-    now = datetime.datetime.fromtimestamp(
-        time.time(), tz=datetime.timezone.utc
-    )
-    ldt_re = re.compile(r"^_LDT = .*$", re.M)
-    with open(MODULEPATH, "w") as f:
-        f.write(ldt_re.sub("_LDT = %r  # noqa: E501" % now, text))
+    with open(METADATA_PATH, "r") as infile:
+        metadata = json.load(infile)
+
+    now = datetime.datetime.fromtimestamp(time.time(), tz=datetime.timezone.utc)
+    metadata["ldt"] = now.strftime("%Y%m%d %H:%M:%S %Z")
+
+    with open(METADATA_PATH, "w") as outfile:
+        json.dump(metadata, outfile)
+
     print(
         colorama.Fore.GREEN
-        + "Replaced timestamp with %r in %s" % (now, MODULEPATH)
+        + "Replaced timestamp with %r in %s" % (now, METADATA_PATH)
         + colorama.Style.RESET_ALL
     )
 
